@@ -1,7 +1,12 @@
 from .utils import Atom, Residue, ActiveSite
 import pandas as pd
 import numpy as np
+from scipy import spatial
+import itertools
+# import math
 
+# format the active site data into a df with the active sites as
+# index and a list of unit vectors for the residues
 def format_data(active_sites):
     # active sites contain residues, contain atoms, contain coords
 
@@ -41,24 +46,15 @@ def format_data(active_sites):
 
     # list the residues and max/min coords for each active site
     group_bb = pd_backbone.groupby(['activesite']).agg(lambda x: list(x))
+    group_bb.drop(['aminoacid'],inplace=True,axis=1)
 
-    # get angle between each consecutive residue pair in active site (could add the first to the end to get all)
-    collect_angles = []
-    for index, row in group_bb.iterrows():
-        collect = []
-        for i in range(len(row['aminoacid'])-1):
-            aa1 = row['aminoacid'][i]
-            aa2 = row['aminoacid'][i+1]
-            v1 = row['unit_v'][i]
-            v2 = row['unit_v'][i+1]
-            angle = np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
-            # print('distance between {0} and {1} is {2}'.format(aa1,aa2,angle))
-            collect.append(angle)
-        collect_angles.append(collect)
-    group_bb['angle'] = collect_angles
-    group_bb.drop(['aminoacid','unit_v'],inplace=True,axis=1)
-    return group_bb
+    # get average of vectors
+    group_bb['ave'] = group_bb['unit_v'].apply(lambda x: [float(sum(col))/len(col) for col in zip(*x)])
+    group_ave = group_bb[['ave']]
 
+    return group_ave
+
+# compute the cosine similarity between each pair of active sites
 def compute_similarity(site_a, site_b):
     """
     Compute the similarity between two given ActiveSite instances.
@@ -66,14 +62,11 @@ def compute_similarity(site_a, site_b):
     Input: two ActiveSite instances
     Output: the similarity between them (a floating point number)
     """
-    similarity = 0.0 # 0 if no similarity, 1 if the same
-    # cosine similarity
-
-    # jaccard similarity
-    # kabash algorithm
-
+    # get cosine similarity between each pair of unit vectors from each list
+    # cosine simliarity computes distance, subtract from 1 for similarity
+    # 0.0 # 0 if no similarity, 1 if the same
+    similarity = 1 - spatial.distance.cosine(site_a, site_b)
     return similarity
-
 
 def cluster_by_partitioning(active_sites):
     """
@@ -85,24 +78,27 @@ def cluster_by_partitioning(active_sites):
             ActiveSite instances)
     """
 
-    # len = active_sites.len()
     # k = 5
-    format_data(active_sites)
-    for index, row in group_bb.iterrows():
-        # site_a = 
-        compute_similarity(site_a, site_b)
+    collect_comp = []
+    collect_names = []
+    df_sites = format_data(active_sites)
 
+    # compare every active site to every other active site
+    for indexone, rowone in df_sites.iterrows():
+        collect_names.append(indexone)
+        collect = []
+        site_a = rowone['ave']
+        for indextwo, rowtwo in df_sites.iterrows():
+            site_b = rowtwo['ave']
+            collect.append(compute_similarity(site_a, site_b))
+        collect_comp.append(collect)
 
-    # compare the similarites
+    df_cosine = pd.DataFrame(collect_comp,columns=collect_names,index=collect_names)
 
     # pick random starting points for k clusters
     # assign to nearest cluster centroid
     # new cluster center by taking the average of the assigned points
     # recursive 2/3 until non change (bistable? - or cap)
-
-
-
-
 
     return []
 

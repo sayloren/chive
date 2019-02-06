@@ -41,12 +41,23 @@ def format_data(active_sites):
 
     # list the residues and max/min coords for each active site
     group_bb = pd_backbone.groupby(['activesite']).agg(lambda x: list(x))
-    # get angle between each residue
 
-    # return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
-    print(pd_backbone.head())
-    return pd_backbone
-
+    # get angle between each consecutive residue pair in active site (could add the first to the end to get all)
+    collect_angles = []
+    for index, row in group_bb.iterrows():
+        collect = []
+        for i in range(len(row['aminoacid'])-1):
+            aa1 = row['aminoacid'][i]
+            aa2 = row['aminoacid'][i+1]
+            v1 = row['unit_v'][i]
+            v2 = row['unit_v'][i+1]
+            angle = np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
+            # print('distance between {0} and {1} is {2}'.format(aa1,aa2,angle))
+            collect.append(angle)
+        collect_angles.append(collect)
+    group_bb['angle'] = collect_angles
+    group_bb.drop(['aminoacid','unit_v'],inplace=True,axis=1)
+    return group_bb
 
 def compute_similarity(site_a, site_b):
     """
@@ -77,7 +88,9 @@ def cluster_by_partitioning(active_sites):
     # len = active_sites.len()
     # k = 5
     format_data(active_sites)
-
+    for index, row in group_bb.iterrows():
+        # site_a = 
+        compute_similarity(site_a, site_b)
 
 
     # compare the similarites

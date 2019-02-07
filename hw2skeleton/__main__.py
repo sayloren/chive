@@ -11,16 +11,16 @@ if len(sys.argv) < 4:
     sys.exit(0)
 
 active_sites = read_active_sites(sys.argv[2])
-
+k = 5
 # Choose clustering algorithm
 if sys.argv[1][0:2] == '-P':
     print("Clustering using Partitioning method")
-    clustering = cluster_by_partitioning(active_sites)
+    clustering = cluster_by_partitioning(active_sites,k)
     write_clustering(sys.argv[3], clustering)
 
 if sys.argv[1][0:2] == '-H':
     print("Clustering using hierarchical method")
-    clusterings = cluster_hierarchically(active_sites)
+    clusterings = cluster_hierarchically(active_sitesk,)
     write_mult_clusterings(sys.argv[3], clusterings)
 
 # make a random grouping to compare against

@@ -111,7 +111,7 @@ def create_clusters(df,centers,k):
     return clusters,new_centers
 
 # k means
-def cluster_by_partitioning(active_sites):
+def cluster_by_partitioning(active_sites,k):
     """
     Cluster a given set of ActiveSite instances using a partitioning method.
 
@@ -124,7 +124,6 @@ def cluster_by_partitioning(active_sites):
     matrix_sites = make_distance_matrix(df_sites)
 
     # initialize the clusters randomly
-    k = 5
     np.random.seed(3)
     names = matrix_sites.index.tolist()
     centers = [np.random.choice(names) for i in range(k)]
@@ -132,14 +131,16 @@ def cluster_by_partitioning(active_sites):
 
     # while the centers are not the same as the previous iteration
     # creat the clusters
-    while collections.Counter(centers) != collections.Counter(test):
+    count = 0
+    while (collections.Counter(centers) != collections.Counter(test) or count < 20):
         test = centers
         clusters,centers = create_clusters(matrix_sites,centers,k)
+        count += 1
 
     return clusters
 
 # ward hierarchical
-def cluster_hierarchically(active_sites):
+def cluster_hierarchically(active_sites,k):
     """
     Cluster the given set of ActiveSite instances using a hierarchical algorithm.                                                                  #
 
@@ -147,7 +148,13 @@ def cluster_hierarchically(active_sites):
     Output: a list of clusterings
             (each clustering is a list of lists of Sequence objects)
     """
+    df_sites = format_data(active_sites)
+    matrix_sites = make_distance_matrix(df_sites)
 
-    # Fill in your code here!
+    # 1 - merge points that are closest
+    # 2 - stop when get k clusters
+    # while len(clusters) != k:
 
-    return []
+
+
+    # return []

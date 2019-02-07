@@ -60,7 +60,7 @@ def make_distance_matrix(df_sites):
     collect_comp = []
     collect_names = []
 
-    # compare every active site to every other active site
+    # compare every active site distance matrix value to every other
     for indexone, rowone in df_sites.iterrows():
         collect_names.append(indexone)
         collect = []
@@ -70,8 +70,8 @@ def make_distance_matrix(df_sites):
             collect.append(compute_similarity(site_a, site_b))
         collect_comp.append(collect)
 
-    df_cosine = pd.DataFrame(collect_comp,columns=collect_names,index=collect_names)
-    return df_cosine
+    df_matrix = pd.DataFrame(collect_comp,columns=collect_names,index=collect_names)
+    return df_matrix
 
 # compute the cosine similarity between each pair of active sites
 def compute_similarity(site_a, site_b):
@@ -91,6 +91,9 @@ def compute_similarity(site_a, site_b):
 def create_clusters(df,centers,k):
     clusters = [[] for i in range(k)]
     clusters_vals = [[] for i in range(k)]
+
+    # iterate through each active site, get the value from the matrix
+    # corresponding to the center and append to cluster
     for index, row in df.iterrows():
         get_values = [df.loc[c,index] for c in centers]
         max_index = get_values.index(max(get_values))
@@ -120,18 +123,22 @@ def cluster_by_partitioning(active_sites):
     df_sites = format_data(active_sites)
     matrix_sites = make_distance_matrix(df_sites)
 
-    names = matrix_sites.index.tolist()
+    # initialize the clusters randomly
     k = 5
     np.random.seed(3)
+    names = matrix_sites.index.tolist()
     centers = [np.random.choice(names) for i in range(k)]
     test = np.empty(k)
+
+    # while the centers are not the same as the previous iteration
+    # creat the clusters
     while collections.Counter(centers) != collections.Counter(test):
         test = centers
         clusters,centers = create_clusters(matrix_sites,centers,k)
 
     return clusters
 
-# ward hierarchical 
+# ward hierarchical
 def cluster_hierarchically(active_sites):
     """
     Cluster the given set of ActiveSite instances using a hierarchical algorithm.                                                                  #

@@ -2,7 +2,8 @@ from .utils import Atom, Residue, ActiveSite
 import pandas as pd
 import numpy as np
 from scipy import spatial
-import itertools
+# import itertools
+import collections
 # import math
 
 # format the active site data into a df with the active sites as
@@ -54,6 +55,24 @@ def format_data(active_sites):
 
     return group_ave
 
+# make matrix comparing every active site to every other active site
+def make_distance_matrix(df_sites):
+    collect_comp = []
+    collect_names = []
+
+    # compare every active site to every other active site
+    for indexone, rowone in df_sites.iterrows():
+        collect_names.append(indexone)
+        collect = []
+        site_a = rowone['ave']
+        for indextwo, rowtwo in df_sites.iterrows():
+            site_b = rowtwo['ave']
+            collect.append(compute_similarity(site_a, site_b))
+        collect_comp.append(collect)
+
+    df_cosine = pd.DataFrame(collect_comp,columns=collect_names,index=collect_names)
+    return df_cosine
+
 # compute the cosine similarity between each pair of active sites
 def compute_similarity(site_a, site_b):
     """
@@ -68,6 +87,27 @@ def compute_similarity(site_a, site_b):
     similarity = 1 - spatial.distance.cosine(site_a, site_b)
     return similarity
 
+# cluster the data to closest value in centers
+def create_clusters(df,centers,k):
+    clusters = [[] for i in range(k)]
+    clusters_vals = [[] for i in range(k)]
+    for index, row in df.iterrows():
+        get_values = [df.loc[c,index] for c in centers]
+        max_index = get_values.index(max(get_values))
+        max_val = max(get_values)
+        clusters[max_index].append(index)
+        clusters_vals[max_index].append(max_val)
+
+    # for each cluster, get the median value and return as the new centers
+    new_centers = []
+    for c,d in zip(clusters,centers):
+        new_c = sorted(c)
+        index = int((len(new_c)-1)/2)
+        new_centers.append(new_c[index])
+
+    return clusters,new_centers
+
+# k means
 def cluster_by_partitioning(active_sites):
     """
     Cluster a given set of ActiveSite instances using a partitioning method.
@@ -77,32 +117,21 @@ def cluster_by_partitioning(active_sites):
             (this is really a list of clusters, each of which is list of
             ActiveSite instances)
     """
-
-    # k = 5
-    collect_comp = []
-    collect_names = []
     df_sites = format_data(active_sites)
+    matrix_sites = make_distance_matrix(df_sites)
 
-    # compare every active site to every other active site
-    for indexone, rowone in df_sites.iterrows():
-        collect_names.append(indexone)
-        collect = []
-        site_a = rowone['ave']
-        for indextwo, rowtwo in df_sites.iterrows():
-            site_b = rowtwo['ave']
-            collect.append(compute_similarity(site_a, site_b))
-        collect_comp.append(collect)
+    names = matrix_sites.index.tolist()
+    k = 5
+    np.random.seed(3)
+    centers = [np.random.choice(names) for i in range(k)]
+    test = np.empty(k)
+    while collections.Counter(centers) != collections.Counter(test):
+        test = centers
+        clusters,centers = create_clusters(matrix_sites,centers,k)
 
-    df_cosine = pd.DataFrame(collect_comp,columns=collect_names,index=collect_names)
+    return clusters
 
-    # pick random starting points for k clusters
-    # assign to nearest cluster centroid
-    # new cluster center by taking the average of the assigned points
-    # recursive 2/3 until non change (bistable? - or cap)
-
-    return []
-
-
+# ward hierarchical 
 def cluster_hierarchically(active_sites):
     """
     Cluster the given set of ActiveSite instances using a hierarchical algorithm.                                                                  #

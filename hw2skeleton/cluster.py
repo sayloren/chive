@@ -2,7 +2,6 @@ from .utils import Atom, Residue, ActiveSite
 import pandas as pd
 import numpy as np
 from scipy import spatial
-# import itertools
 import collections
 # import math
 
@@ -149,12 +148,18 @@ def cluster_hierarchically(active_sites,k):
             (each clustering is a list of lists of Sequence objects)
     """
     df_sites = format_data(active_sites)
-    matrix_sites = make_distance_matrix(df_sites)
+    df_sites = make_distance_matrix(df_sites)
 
-    # 1 - merge points that are closest
-    # 2 - stop when get k clusters
-    # while len(clusters) != k:
+    row_total = df_sites.sum()/len(df_sites)
+    average_distance = row_total.sum()/len(row_total)
+
+    # 1 - each point is its own cluster
+    # 2 - merge points that are closest (use the centroid of the cluster)
+    # 3 - stop when get k clusters | when the max distance is reached
+
+    while len(clusters) < k: #or average_distance
+        # find the smallest value in the matrix, make those two points a cluster
+        # compute the new centroid for that cluster and the proximity to the other clusters
 
 
-
-    # return []
+    return []

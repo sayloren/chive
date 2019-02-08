@@ -20,7 +20,7 @@ if sys.argv[1][0:2] == '-P':
 
 if sys.argv[1][0:2] == '-H':
     print("Clustering using hierarchical method")
-    clusterings = cluster_hierarchically(active_sitesk,)
+    clusterings = cluster_hierarchically(active_sites,k)
     write_mult_clusterings(sys.argv[3], clusterings)
 
 # make a random grouping to compare against

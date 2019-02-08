@@ -128,8 +128,7 @@ def cluster_by_partitioning(active_sites,k):
     centers = [np.random.choice(names) for i in range(k)]
     test = np.empty(k)
 
-    # while the centers are not the same as the previous iteration
-    # creat the clusters
+    # while the centers are not the same as the previous iteration, cluster
     count = 0
     while (collections.Counter(centers) != collections.Counter(test) or count < 20):
         test = centers
@@ -148,18 +147,25 @@ def cluster_hierarchically(active_sites,k):
             (each clustering is a list of lists of Sequence objects)
     """
     df_sites = format_data(active_sites)
-    df_sites = make_distance_matrix(df_sites)
+    matrix_sites = make_distance_matrix(df_sites)
 
-    row_total = df_sites.sum()/len(df_sites)
-    average_distance = row_total.sum()/len(row_total)
+    # get the average distance from the matrix
+    average_distance = matrix_sites.sum().sum()/len(matrix_sites.index)
 
     # 1 - each point is its own cluster
     # 2 - merge points that are closest (use the centroid of the cluster)
     # 3 - stop when get k clusters | when the max distance is reached
 
+    clusters = []
     while len(clusters) < k: #or average_distance
+
         # find the smallest value in the matrix, make those two points a cluster
+        i = matrix_sites.min().idxmin() # the index of the row with the smallest value
+        j = matrix_sites.idxmin()[i]
+        smallest_value = matrix_sites.loc[i,j] # these are the two that are going to be clustered
+
         # compute the new centroid for that cluster and the proximity to the other clusters
+        # print(matrix_sites.min().min()
 
 
     return []

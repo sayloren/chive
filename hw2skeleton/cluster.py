@@ -148,7 +148,7 @@ def cluster_by_partitioning(matrix_sites,k):
         for c in clusters:
             if i in c:
                 collect.append(clusters.index(c))    #
-    return clusters
+    return collect
 
 # agglomerative clustering
 def cluster_hierarchically(matrix_sites,k):

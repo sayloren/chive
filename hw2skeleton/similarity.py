@@ -2,19 +2,44 @@ import matplotlib.pyplot as plt
 from .cluster import cluster_by_partitioning, cluster_hierarchically, cluster_randomly
 from hw2skeleton import io
 from sklearn.metrics.cluster import adjusted_rand_score
+from sklearn.metrics import silhouette_score
+import pandas as pd
+import seaborn as sns
+import pathlib
+
 
 def run_similarity_evals(matrix_sites,k):
-    part_clustering = cluster_by_partitioning(matrix_sites,k)
+
+    # run clustering algs
+    part_clusterings = cluster_by_partitioning(matrix_sites,k)
     hier_clusterings = cluster_hierarchically(matrix_sites,k)
     rand_clusterings = cluster_randomly(matrix_sites,k)
 
+    # get silhouette score for each cluster alg
+    print(silhouette_score(matrix_sites,part_clusterings))
+    print(silhouette_score(matrix_sites,hier_clusterings))
+    print(silhouette_score(matrix_sites,rand_clusterings))
+
     # compare my partitioning and hierarchical clustering methods
-    # rand_score = adjusted_rand_score()
-    # print(rand_score)
+    print(adjusted_rand_score(part_clusterings,hier_clusterings))
+    print(adjusted_rand_score(part_clusterings,rand_clusterings))
+    print(adjusted_rand_score(hier_clusterings,rand_clusterings))
 
+    # get the histograms for the number of active sites in each clusters per method
+    fig = plt.figure(figsize=(10,10))
+    sns.distplot(part_clusterings,color='#f21e5e',label='partition')
+    sns.distplot(hier_clusterings,color='#d409cc',label='hierarchy')
+    sns.distplot(rand_clusterings,color='#e7df1b',label='random')
+    plt.title('Clustering with k = {0}'.format(k))
+    sns.despine()
+    plt.legend()
 
+    outdir = pathlib.Path('images')
+    outfile = outdir / "Cluster_hist.png"
+    outdir.mkdir(parents=True, exist_ok=True)
+    plt.savefig(str(outfile),format='png')
+    plt.close()
 
-    # eval clustering alg with davis boulding in
 
     # plotting
     # pca = decomposition.PCA(n_components=4)

@@ -1,12 +1,12 @@
 import sys
 from .io import read_active_sites, write_clustering, write_mult_clusterings
 from .cluster import cluster_by_partitioning, cluster_hierarchically, format_data, make_distance_matrix,cluster_randomly
-import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import decomposition
 import pandas as pd
 import seaborn as sns
 import scipy.cluster.hierarchy as shc
+from .similarity import run_similarity_evals
 
 # Some quick stuff to make sure the program is called correctly
 if len(sys.argv) < 4:
@@ -39,3 +39,5 @@ if sys.argv[1][0:2] == '-R':
     print("Clustering using randomly")
     clusterings = cluster_randomly(matrix_sites,k)
     write_mult_clusterings(sys.argv[3], clusterings)
+
+run_similarity_evals(matrix_sites,k)

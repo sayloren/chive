@@ -5,7 +5,6 @@ from scipy import spatial
 import collections
 from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
-from sklearn.metrics.cluster import adjusted_rand_score
 
 # format the active site data into a df with the active sites as
 # index and a list of unit vectors for the residues
@@ -96,9 +95,17 @@ def create_partition_clusters(df,centers,k):
     # iterate through each active site, get the value from the matrix
     # corresponding to the center and append to cluster
     for index, row in df.iterrows():
+
+        # get the distance matrix values for the centers
         get_values = [df.loc[c,index] for c in centers]
+
+        # get the index of the maximum value from the list of centers
         max_index = get_values.index(max(get_values))
+
+        # get the maximum value itself
         max_val = max(get_values)
+
+        # append the index of the max value to the index of the cluster that it is closest to
         clusters[max_index].append(index)
         clusters_vals[max_index].append(max_val)
 
@@ -135,6 +142,12 @@ def cluster_by_partitioning(matrix_sites,k):
         clusters,centers = create_partition_clusters(matrix_sites,centers,k)
         count += 1
 
+    # make a list with the index of the cluster that contains the active site
+    collect = []
+    for i in names:
+        for c in clusters:
+            if i in c:
+                collect.append(clusters.index(c))    #
     return clusters
 
 # agglomerative clustering
@@ -146,26 +159,15 @@ def cluster_hierarchically(matrix_sites,k):
     Output: a list of clusterings
             (each clustering is a list of lists of Sequence objects)
     """
-
-    # make the list of clusters to return
-    clusters = [[] for i in range(k)]
-
     # cluster using the agglomerative method;
     # each active site starts as its own cluster,
     # merge each pair of active sites into the same cluster if
     # they have the smallest distance between the closest points (single)
     # in euclidean space
-    cluster = AgglomerativeClustering(n_clusters=k, affinity='euclidean', linkage='single')
+    cluster = AgglomerativeClustering(n_clusters=k, affinity='euclidean', linkage='complete')
     cluster.fit_predict(matrix_sites)
-    cluster_labels = cluster.labels_
-    site_labels = list(matrix_sites.columns.values)
 
-    # using the index of cluster labels created, get the active site names to
-    # populate the return clustered list
-    for s,c in zip(site_labels,cluster_labels):
-        clusters[c].append(s)
-
-    return clusters
+    return cluster.labels_
 
 # random clustering
 def cluster_randomly(matrix_sites,k):
@@ -176,9 +178,6 @@ def cluster_randomly(matrix_sites,k):
     Output: a list of clusterings
             (each clustering is a list of lists of Sequence objects)
     """
-    # make empty list with the number of clusters desired
-    clusters = [[] for i in range(k)]
-
     # collect the active site labels
     site_labels = list(matrix_sites.columns.values)
 
@@ -186,11 +185,7 @@ def cluster_randomly(matrix_sites,k):
     # labels, with a random index for one of the k number of clusters
     cluster_labels = np.random.choice(k, len(site_labels))
 
-    # populate the clusters
-    for s,c in zip(site_labels,cluster_labels):
-        clusters[c].append(s)
-
-    return clusters
+    return cluster_labels
 
 # this is code from when I tried to make my own hierarchical clustering alg,
 # but couldn't get it put together in time

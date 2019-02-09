@@ -1,19 +1,17 @@
 # HW2 Skeleton
 
 [![Build
-Status](https://travis-ci.org/ucsf-bmi-203/hw2-skeleton.svg?branch=master)](https://travis-ci.org/ucsf-bmi-203/hw2-skeleton)
+Status](https://travis-ci.org/sayloren/chive.svg?branch=master)](https://travis-ci.org/sayloren/chive)
 
-Skeleton for clustering project.
+[Travis Build Results](https://travis-ci.org/sayloren/chive)
 
-## assignment
+:see_no_evil: :hear_no_evil: :speak_no_evil:
 
-1. Implement a similarity metric
-2. Implement a clustering method based on a partitioning algorithm
-3. Implement a clustering method based on a hierarchical algorithm
-4. Answer the questions given in the homework assignment
+## UCSF BMI 203 Algorithms Homework 2018
 
+#### Clustering
 
-## structure
+## project file structure
 
 The main file that you will need to modify is `cluster.py` and the corresponding `test_cluster.py`. `utils.py` contains helpful classes that you can use to represent Active Sites. `io.py` contains some reading and writing files for interacting with PDB files and writing out cluster info.
 
@@ -59,6 +57,13 @@ python -m pytest
 
 from the root directory of this project.
 
+![a](/images/Cluster_hist.png)
+
+| Cluster | k | silhouette score| rand cluster | rand index |
+| ---------- |:----------:|:----------:|:----------:|:----------:|
+| Partitioning | 5 | 0.265 | Hierarchical | 0.373 |
+| Hierarchical | 5 | 0.407 | Random | 0.008 |
+| Random | 5 | -0.125 | partitioning | -0.001 |
 
 ## contributors
 

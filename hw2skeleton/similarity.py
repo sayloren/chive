@@ -40,7 +40,6 @@ def run_similarity_evals(matrix_sites,k):
     plt.savefig(str(outfile),format='png')
     plt.close()
 
-
     # plotting
     # pca = decomposition.PCA(n_components=4)
     # pc = pca.fit_transform(matrix_sites)

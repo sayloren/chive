@@ -17,7 +17,7 @@ if len(sys.argv) < 4:
 active_sites = read_active_sites(sys.argv[2])
 
 # set number of clusters
-k = 3
+k = 5
 
 # transform the active sites
 df_sites = format_data(active_sites)

@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 from scipy import spatial
 import collections
-# import math
+from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
 
 # format the active site data into a df with the active sites as
 # index and a list of unit vectors for the residues
@@ -87,7 +88,7 @@ def compute_similarity(site_a, site_b):
     return similarity
 
 # cluster the data to closest value in centers
-def create_clusters(df,centers,k):
+def create_partition_clusters(df,centers,k):
     clusters = [[] for i in range(k)]
     clusters_vals = [[] for i in range(k)]
 
@@ -110,7 +111,7 @@ def create_clusters(df,centers,k):
     return clusters,new_centers
 
 # k means
-def cluster_by_partitioning(active_sites,k):
+def cluster_by_partitioning(matrix_sites,k):
     """
     Cluster a given set of ActiveSite instances using a partitioning method.
 
@@ -119,8 +120,6 @@ def cluster_by_partitioning(active_sites,k):
             (this is really a list of clusters, each of which is list of
             ActiveSite instances)
     """
-    df_sites = format_data(active_sites)
-    matrix_sites = make_distance_matrix(df_sites)
 
     # initialize the clusters randomly
     np.random.seed(3)
@@ -132,13 +131,12 @@ def cluster_by_partitioning(active_sites,k):
     count = 0
     while (collections.Counter(centers) != collections.Counter(test) or count < 20):
         test = centers
-        clusters,centers = create_clusters(matrix_sites,centers,k)
+        clusters,centers = create_partition_clusters(matrix_sites,centers,k)
         count += 1
 
     return clusters
 
-# ward hierarchical
-def cluster_hierarchically(active_sites,k):
+def cluster_hierarchically(matrix_sites,k):
     """
     Cluster the given set of ActiveSite instances using a hierarchical algorithm.                                                                  #
 
@@ -146,26 +144,60 @@ def cluster_hierarchically(active_sites,k):
     Output: a list of clusterings
             (each clustering is a list of lists of Sequence objects)
     """
-    df_sites = format_data(active_sites)
-    matrix_sites = make_distance_matrix(df_sites)
 
-    # get the average distance from the matrix
-    average_distance = matrix_sites.sum().sum()/len(matrix_sites.index)
+    # make the list of clusters to return
+    clusters = [[] for i in range(k)]
 
-    # 1 - each point is its own cluster
-    # 2 - merge points that are closest (use the centroid of the cluster)
-    # 3 - stop when get k clusters | when the max distance is reached
+    # cluster using the agglomerative method;
+    #
+    cluster = AgglomerativeClustering(n_clusters=k, affinity='euclidean', linkage='ward')
+    cluster.fit_predict(matrix_sites)
+    cluster_labels = cluster.labels_
+    site_labels = list(matrix_sites.columns.values)
 
-    clusters = []
-    while len(clusters) < k: #or average_distance
+    # using the index of cluster labels created, get the active site names to
+    # populate the return clustered list
+    for s,c in zip(site_labels,cluster_labels):
+        clusters[c].append(s)
 
-        # find the smallest value in the matrix, make those two points a cluster
-        i = matrix_sites.min().idxmin() # the index of the row with the smallest value
-        j = matrix_sites.idxmin()[i]
-        smallest_value = matrix_sites.loc[i,j] # these are the two that are going to be clustered
-
-        # compute the new centroid for that cluster and the proximity to the other clusters
-        # print(matrix_sites.min().min()
+    return clusters
 
 
-    return []
+# this is code from when I tried to make my own hierarchical clustering alg,
+# but couldn't get it put together in time
+
+    # # get the average distance from the matrix
+    # # average_distance = matrix_sites.sum().sum()/len(matrix_sites.index)
+    #
+    # # 1 - each point is its own cluster
+    # # 2 - merge points that are closest (use the centroid of the cluster)
+    # # 3 - stop when get k clusters | when the max distance is reached
+    #
+    # # clusters = [[] for i in range(k)] # make k empty clusters
+    # clusters = [[]]
+    # # while [not i for i in clusters]: # while any cluster is empty
+    #
+    # # while len(clusters) < k:
+    # while any(matrix_sites.values.flatten() < 1.1):
+    #     print(clusters)
+    #     i = matrix_sites.min().idxmin()
+    #     j = matrix_sites.idxmin()[i]
+    #     print(i,j)
+    #     # smallest_value = matrix_sites.loc[i,j]
+    #
+    #
+    #     list_index_i = next((c for c,v in enumerate(clusters) if i in v), -1)
+    #     list_index_j = next((c for c,v in enumerate(clusters) if j in v), -1)
+    #     if list_index_i != -1:
+    #         clusters[list_index_i].append(j)
+    #     elif list_index_j != -1:
+    #         clusters[list_index_j].append(i)
+    #     else:
+    #         clusters.append([i,j])
+    #
+    #     matrix_sites.loc[i,j] = 1.1
+    #     matrix_sites.loc[j,i] = 1.1
+    #     print(matrix_sites.loc[i,j])
+    #
+    # print(clusters)
+    # # pd_sort = matrix_sites.sort_values(i).sort_values(j,axis=1)

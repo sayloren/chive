@@ -1,4 +1,4 @@
-# HW2 Skeleton
+## UCSF BMI 203 Algorithms Homework 2018
 
 [![Build
 Status](https://travis-ci.org/sayloren/chive.svg?branch=master)](https://travis-ci.org/sayloren/chive)
@@ -6,8 +6,6 @@ Status](https://travis-ci.org/sayloren/chive.svg?branch=master)](https://travis-
 [Travis Build Results](https://travis-ci.org/sayloren/chive)
 
 :see_no_evil: :hear_no_evil: :speak_no_evil:
-
-## UCSF BMI 203 Algorithms Homework 2018
 
 #### Clustering
 

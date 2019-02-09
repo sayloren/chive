@@ -23,6 +23,7 @@ The main file that you will need to modify is `cluster.py` and the corresponding
 │   ├── __main__.py
 │   ├── cluster.py
 │   ├── io.py
+│   ├── similarity.py
 │   └── utils.py
 └── test
     ├── test_cluster.py

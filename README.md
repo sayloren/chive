@@ -57,11 +57,13 @@ from the root directory of this project.
 
 ![a](/images/Cluster_hist.png)
 
+![a](/images/Cluster_venn.png)
+
 | Cluster | k | silhouette score| rand cluster | rand index |
 | ---------- |:----------:|:----------:|:----------:|:----------:|
 | Partitioning | 5 | 0.265 | Hierarchical | 0.373 |
 | Hierarchical | 5 | 0.407 | Random | 0.008 |
-| Random | 5 | -0.125 | partitioning | -0.001 |
+| Random | 5 | -0.125 | Partitioning | -0.001 |
 
 ## contributors
 

@@ -18,8 +18,8 @@ def format_data(active_sites):
         for r in s.residues:
             collect_bb = [str(s),r.type]
             collect_a = []
-            for a in r.atoms:
-                collect_a.append(a.coords) # r.atoms[:3] are N, CA, C
+            for a in r.atoms[:3]: # r.atoms[:3] are N, CA, C
+                collect_a.append(a.coords)
             x_vals = [item[0] for item in collect_a]
             y_vals = [item[1] for item in collect_a]
             z_vals = [item[2] for item in collect_a]

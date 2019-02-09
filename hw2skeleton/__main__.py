@@ -7,6 +7,7 @@ from sklearn import decomposition
 import pandas as pd
 import seaborn as sns
 import scipy.cluster.hierarchy as shc
+
 # Some quick stuff to make sure the program is called correctly
 if len(sys.argv) < 4:
     print("Usage: python -m hw2skeleton [-P| -H | -R] <pdb directory> <output file>")
@@ -25,7 +26,7 @@ matrix_sites = make_distance_matrix(df_sites)
 # Choose clustering algorithm
 if sys.argv[1][0:2] == '-P':
     print("Clustering using Partitioning method")
-    clustering = cluster_bypartitioning(matrix_sites,k)
+    clustering = cluster_by_partitioning(matrix_sites,k)
     write_clustering(sys.argv[3], clustering)
 
 if sys.argv[1][0:2] == '-H':

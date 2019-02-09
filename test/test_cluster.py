@@ -35,3 +35,23 @@ def test_hierarchical_clustering():
 
     # update this assertion
     assert cluster.cluster_hierarchically(active_sites) == []
+
+
+
+
+
+
+# make a random grouping to compare against
+# eval clustering alg with davis boulding in
+
+# plotting
+# pca = decomposition.PCA(n_components=4)
+# pc = pca.fit_transform(matrix_sites)
+# pc_df = pd.DataFrame(data = pc,columns=['PC1', 'PC2','PC3','PC4'])
+# pc_df['Cluster'] = list(matrix_sites.columns.values)
+# df = pd.DataFrame({'var':pca.explained_variance_ratio_,'PC':['PC1','PC2','PC3','PC4']})
+# sns.barplot(x='PC',y="var",data=df, color="c");
+# sns.lmplot( x="PC1", y="PC2",data=pc_df,fit_reg=False,hue='Cluster',legend=True,scatter_kws={"s": 80}) # specify the point size
+# plt.show()
+
+# rand_score = adjusted_rand_score(clusterings,)

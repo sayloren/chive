@@ -5,6 +5,7 @@ from scipy import spatial
 import collections
 from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
+from sklearn.metrics.cluster import adjusted_rand_score
 
 # format the active site data into a df with the active sites as
 # index and a list of unit vectors for the residues
@@ -136,6 +137,7 @@ def cluster_by_partitioning(matrix_sites,k):
 
     return clusters
 
+# agglomerative clustering
 def cluster_hierarchically(matrix_sites,k):
     """
     Cluster the given set of ActiveSite instances using a hierarchical algorithm.                                                                  #
@@ -149,8 +151,11 @@ def cluster_hierarchically(matrix_sites,k):
     clusters = [[] for i in range(k)]
 
     # cluster using the agglomerative method;
-    #
-    cluster = AgglomerativeClustering(n_clusters=k, affinity='euclidean', linkage='ward')
+    # each active site starts as its own cluster,
+    # merge each pair of active sites into the same cluster if
+    # they have the smallest distance between the closest points (single)
+    # in euclidean space
+    cluster = AgglomerativeClustering(n_clusters=k, affinity='euclidean', linkage='single')
     cluster.fit_predict(matrix_sites)
     cluster_labels = cluster.labels_
     site_labels = list(matrix_sites.columns.values)
@@ -162,6 +167,30 @@ def cluster_hierarchically(matrix_sites,k):
 
     return clusters
 
+# random clustering
+def cluster_randomly(matrix_sites,k):
+    """
+    Cluster the given set of ActiveSite instances randomly.                                                                  #
+
+    Input: a list of ActiveSite instances
+    Output: a list of clusterings
+            (each clustering is a list of lists of Sequence objects)
+    """
+    # make empty list with the number of clusters desired
+    clusters = [[] for i in range(k)]
+
+    # collect the active site labels
+    site_labels = list(matrix_sites.columns.values)
+
+    # randomly make a list of the same size as the number of active sites
+    # labels, with a random index for one of the k number of clusters
+    cluster_labels = np.random.choice(k, len(site_labels))
+
+    # populate the clusters
+    for s,c in zip(site_labels,cluster_labels):
+        clusters[c].append(s)
+
+    return clusters
 
 # this is code from when I tried to make my own hierarchical clustering alg,
 # but couldn't get it put together in time
